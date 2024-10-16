@@ -63,10 +63,11 @@
 }
 
 .ls-list {
-    overflow-y: auto; /* Enable scrolling */
+    overflow-y: scroll; /* Enable scrolling */
     margin-top: 10px;
     padding-right: 5px;
-    height: calc(100vh - 100px);
+    height: 70vh;
+    padding-bottom: 100px;
 }
 
 
