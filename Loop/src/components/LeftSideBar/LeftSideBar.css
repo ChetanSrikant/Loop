@@ -63,10 +63,10 @@
 }
 
 .ls-list {
-    flex: 1; /* Take up remaining space */
     overflow-y: auto; /* Enable scrolling */
     margin-top: 10px;
     padding-right: 5px;
+    height: calc(100vh - 100px);
 }
 
 
