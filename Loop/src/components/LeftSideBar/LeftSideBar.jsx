@@ -1,33 +1,37 @@
-import React from 'react'
-import './LeftSideBar.css'
-import assets from '../../assets/assets'
+import React from "react";
+import "./LeftSideBar.css";
+import assets from "../../assets/assets";
 
 const LeftSideBar = () => {
   return (
-    <div className='ls'>
+    <div className="ls">
       <div className="ls-top">
         <div className="ls-nav">
-            <img src={assets.logo} className='logo' />
-            <div className="menu">
-                <img src={assets.menu_icon} alt="" />
-            </div>
+          <img src={assets.logo} className="logo" alt="Logo" />
+          <div className="menu">
+            <img src={assets.menu_icon} alt="Menu Icon" />
+          </div>
         </div>
         <div className="ls-search">
-            <img src={assets.search_icon} alt="" />
-            <input type="text" placeholder='Search here..'/>
+          <img src={assets.search_icon} alt="Search Icon" />
+          <input type="text" placeholder="Search here.." />
         </div>
         <div className="ls-list">
-            <div className="friends">
-                <img src={assets.profile_img} alt="" />
+          {Array(12)
+            .fill("")
+            .map((item, index) => (
+              <div key={index} className="friends">
+                <img src={assets.profile_img} alt="Profile" />
                 <div>
-                    <p>Richard Sanford</p>
-                    <span>Hello, How are you?</span>
+                  <p>Richard Sanford</p>
+                  <span>Hello, How are you?</span>
                 </div>
-            </div>
+              </div>
+            ))}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LeftSideBar
+export default LeftSideBar;
