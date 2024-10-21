@@ -2,8 +2,9 @@ import React, { useContext , useEffect, useState} from 'react'
 import './ChatBox.css'
 import assets from '../../assets/assets'
 import { AppContext } from '../../context/AppContext'
-import { arrayUnion, doc, onSnapshot, updateDoc } from 'firebase/firestore'
+import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
 import { db } from '../../config/firebase'
+import { toast } from 'react-toastify'
 
 const ChatBox = () => {
 
@@ -11,28 +12,59 @@ const ChatBox = () => {
 
   const [input, setInput] = useState("");
 
-  const sendMessage = async () =>{
+  const sendMessage = async () => {
     try {
-
-      if(input && messagesId){
-        await updateDoc(doc(db,'messages', messagesId),{
+      if (input && messagesId) {
+        // Update messages collection with the new message
+        await updateDoc(doc(db, 'messages', messagesId), {
           messages: arrayUnion({
             sId: userData.id,
-            text:input,
-            createdAt: new Data()
-          })
-        })
+            text: input,
+            createdAt: new Date(),
+          }),
+        });
+  
         const userIds = [chatUser.rId, userData.id];
-
-        userIds.forEach(async (id)=>{
-          const userChatsRef = doc(db, 'chats' , id);
-        })
+  
+        // Update each user's chat data
+        for (const id of userIds) {
+          const userChatsRef = doc(db, 'chats', id);
+          const userChatsSnapshot = await getDoc(userChatsRef);
+  
+          if (userChatsSnapshot.exists()) {
+            const userChatData = userChatsSnapshot.data();
+            const chatsData = userChatData.chatsData || []; // Ensure chatsData exists
+  
+            const chatIndex = chatsData.findIndex((c) => c.messageId === messagesId);
+  
+            // If chat entry exists, update it
+            if (chatIndex !== -1) {
+              chatsData[chatIndex].lastMessage = input.slice(0, 30);
+              chatsData[chatIndex].updatedAt = Date.now();
+              if (chatsData[chatIndex].rId === userData.id) {
+                chatsData[chatIndex].messageSeen = false;
+              }
+  
+              // Update Firestore with the modified chatsData array
+              await updateDoc(userChatsRef, {
+                chatsData,
+              });
+            } else {
+              console.warn(`Chat with messageId ${messagesId} not found.`);
+            }
+          } else {
+            console.warn(`No chat data found for user with ID ${id}.`);
+          }
+        }
       }
-      
     } catch (error) {
-      
+      toast.error(error.message);
+      console.error("Error sending message:", error);
     }
-  }
+    setInput(""); // Clear input after sending the message
+  };
+  
+  
 
   useEffect(() => {
     if (messagesId) {
@@ -44,7 +76,7 @@ const ChatBox = () => {
         unSub()
       }
     }
-  }, [])
+  }, [messagesId])
   
 
   return chatUser ?(
@@ -87,7 +119,7 @@ const ChatBox = () => {
         <label htmlFor="image">
             <img src={assets.gallery_icon} alt="" />
         </label>
-        <img src={assets.send_button} alt="" />
+        <img src={assets.send_button} onClick={sendMessage} alt="" />
       </div>
     </div>
   ):
