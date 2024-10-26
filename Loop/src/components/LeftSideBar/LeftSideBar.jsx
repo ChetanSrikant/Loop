@@ -55,7 +55,7 @@ const LeftSideBar = () => {
         rId: user.id,
         updatedAt: Date.now(),
         messageSeen: true,
-      };
+      };      
 
       await updateDoc(doc(db, "chats", user.id), {
         chatData: arrayUnion(chatEntry),

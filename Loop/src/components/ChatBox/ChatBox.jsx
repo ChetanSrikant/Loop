@@ -33,11 +33,12 @@ const ChatBox = () => {
   
           if (userChatsSnapshot.exists()) {
             const userChatData = userChatsSnapshot.data();
-            const chatsData = userChatData.chatsData || []; // Ensure chatsData exists
+            const chatsData = userChatData.chatData || [];
   
-            const chatIndex = chatsData.findIndex((c) => c.messageId === messagesId);
+            const chatIndex = chatsData.findIndex(
+              (c) => c.messagesID === messagesId
+            );
   
-            // If chat entry exists, update it
             if (chatIndex !== -1) {
               chatsData[chatIndex].lastMessage = input.slice(0, 30);
               chatsData[chatIndex].updatedAt = Date.now();
@@ -47,7 +48,7 @@ const ChatBox = () => {
   
               // Update Firestore with the modified chatsData array
               await updateDoc(userChatsRef, {
-                chatsData,
+                chatData: chatsData,
               });
             } else {
               console.warn(`Chat with messageId ${messagesId} not found.`);
@@ -63,7 +64,6 @@ const ChatBox = () => {
     }
     setInput(""); // Clear input after sending the message
   };
-  
   
 
   useEffect(() => {
