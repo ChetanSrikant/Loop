@@ -10,12 +10,12 @@ import { toast } from "react-toastify";
 import { doc } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCjguJxu8dydnfAMpOp988dpHY0jWMkxPw",
-  authDomain: "loop-e7ccd.firebaseapp.com",
-  projectId: "loop-e7ccd",
-  storageBucket: "loop-e7ccd.appspot.com",
-  messagingSenderId: "1475350183",
-  appId: "1:1475350183:web:770be985bff4ef4807d582"
+  apiKey: "AIzaSyAgz8iVEd9T8mGVmFRnM_QezTaJN_Tuvx0",
+  authDomain: "loop-bfc7c.firebaseapp.com",
+  projectId: "loop-bfc7c",
+  storageBucket: "loop-bfc7c.appspot.com",
+  messagingSenderId: "653225466379",
+  appId: "1:653225466379:web:925058f07c076e1a6bc50e"
 };
 
 const app = initializeApp(firebaseConfig);

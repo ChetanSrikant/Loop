@@ -2,16 +2,31 @@ import React, { useContext, useState } from "react";
 import "./LeftSideBar.css";
 import assets from "../../assets/assets";
 import { useNavigate } from "react-router-dom";
-import { 
-  arrayUnion, collection, doc, getDocs, query, 
-  serverTimestamp, setDoc, updateDoc, where 
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { AppContext } from "../../context/AppContext";
 
 const LeftSideBar = () => {
   const navigate = useNavigate();
-  const { userData, chatData, chatUser, setChatUser, setMessagesId } = useContext(AppContext);
+  const {
+    userData,
+    chatData,
+    chatUser,
+    setChatUser,
+    setMessagesId,
+    messagesId,
+  } = useContext(AppContext);
   const [user, setUser] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -27,7 +42,9 @@ const LeftSideBar = () => {
 
         if (!querySnap.empty && querySnap.docs[0].data().id !== userData.id) {
           const searchedUser = querySnap.docs[0].data();
-          const userExists = chatData?.some((chat) => chat.rId === searchedUser.id);
+          const userExists = chatData?.some(
+            (chat) => chat.rId === searchedUser.id
+          );
           setUser(userExists ? null : searchedUser);
         } else {
           setUser(null);
@@ -44,9 +61,9 @@ const LeftSideBar = () => {
   const addChat = async () => {
     try {
       const newMessageRef = doc(collection(db, "messages"));
-      await setDoc(newMessageRef, { 
-        createdAt: serverTimestamp(), 
-        messages: [] 
+      await setDoc(newMessageRef, {
+        createdAt: serverTimestamp(),
+        messages: [],
       });
 
       const chatEntry = {
@@ -55,7 +72,7 @@ const LeftSideBar = () => {
         rId: user.id,
         updatedAt: Date.now(),
         messageSeen: true,
-      };      
+      };
 
       await updateDoc(doc(db, "chats", user.id), {
         chatData: arrayUnion(chatEntry),
@@ -73,9 +90,17 @@ const LeftSideBar = () => {
     }
   };
 
-  const setChat = (item) => {
+  const setChat = async(item) => {
     setMessagesId(item.messagesID);
     setChatUser(item);
+    const userChatsRef = doc(db, 'chats', userData.id);
+    const userChatsSnapshot = await getDoc(userChatsRef);
+    const userChatsData = userChatsSnapshot.data();
+    const chatIndex = userChatsData.chatData.findIndex((c)=>c.messagesId === item.messagesId);
+    userChatsData.chatData[chatIndex].messageSeen = true;
+    await updateDoc(userChatsRef,{
+      chatData : userChatsData.chatData
+    })
   };
 
   return (
@@ -95,10 +120,10 @@ const LeftSideBar = () => {
 
         <div className="ls-search">
           <img src={assets.search_icon} alt="Search Icon" />
-          <input 
-            onChange={inputHandler} 
-            type="text" 
-            placeholder="Search here..." 
+          <input
+            onChange={inputHandler}
+            type="text"
+            placeholder="Search here..."
           />
         </div>
 
@@ -110,15 +135,16 @@ const LeftSideBar = () => {
             </div>
           ) : (
             (chatData || []).map((item, index) => (
-              <div 
-                key={index} 
-                onClick={() => setChat(item)} 
-                className="friends"
+              <div
+                key={index}
+                onClick={() => setChat(item)}
+                className={`friends ${
+                  item.messageSeen || item.messagesId === messagesId
+                    ? ""
+                    : "border"
+                }`}
               >
-                <img 
-                  src={item.userData.avatar} 
-                  alt="Profile" 
-                />
+                <img src={item.userData.avatar} alt="Profile" />
                 <div>
                   <p>{item.userData.name}</p>
                   <span>{item.lastMessage}</span>
